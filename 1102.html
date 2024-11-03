@@ -1,0 +1,115 @@
+newsdeck/
+│
+├── app.py               # Main Python Flask application
+├── templates/           # Folder for HTML templates
+│   └── index.html       # Main HTML template
+├── static/              # Folder for static files
+│   ├── styles.css       # CSS for styling
+│   └── scripts.js       # JavaScript for interactivity
+└── requirements.txt     # List of dependencies (Flask, etc.)
+from flask import Flask, render_template, jsonify
+
+app = Flask(__name__)
+
+# Sample data simulating articles from Chinese media sources
+articles = [
+    {"title": "人民日报: 新时代的改革开放", "content": "改革开放四十年来，取得了举世瞩目的成就...", "source": "人民日报"},
+    {"title": "光明日报: 教育创新的新方向", "content": "推动教育信息化，加快教育现代化...", "source": "光明日报"},
+    # Add additional sample articles from other sources as needed
+]
+
+@app.route('/')
+def home():
+    return render_template('index.html', articles=articles)
+
+@app.route('/api/articles')
+def get_articles():
+    return jsonify(articles)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsDeck - 新闻筛选平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>NewsDeck</h1>
+        <nav>
+            <a href="#home">首页</a>
+            <a href="#about">关于</a>
+            <a href="#contact">联系我们</a>
+        </nav>
+    </header>
+    <main>
+        <section id="articles">
+            {% for article in articles %}
+            <article>
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.content }}</p>
+                <span>来源: {{ article.source }}</span>
+                <a href="#">阅读更多</a>
+            </article>
+            {% endfor %}
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 NewsDeck. 版权所有</p>
+    </footer>
+</body>
+</html>
+/* styles.css */
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    background-color: #f4f4f4;
+}
+header {
+    background-color: #2a9d8f;
+    color: white;
+    padding: 1em;
+    text-align: center;
+}
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+}
+#articles article {
+    background: white;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 800px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+}
+footer {
+    text-align: center;
+    padding: 1em;
+    background-color: #2a9d8f;
+    color: white;
+}
+// scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const filterInput = document.querySelector('#filterInput');
+    const articles = document.querySelectorAll('article');
+    
+    filterInput.addEventListener('input', function () {
+        const filter = filterInput.value.toLowerCase();
+        articles.forEach(article => {
+            const source = article.querySelector('span').innerText.toLowerCase();
+            if (source.includes(filter)) {
+                article.style.display = 'block';
+            } else {
+                article.style.display = 'none';
+            }
+        });
+    });
+});
+<input type="text" id="filterInput" placeholder="按来源筛选，例如 '人民日报'">
